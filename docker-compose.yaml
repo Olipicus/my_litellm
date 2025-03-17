@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    volumes:
+      - ./config.yaml:/app/config.yaml
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - DATABASE_URL=${DATABASE_URL}
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY}
+    ports:
+      - "4000:4000"
+    command: ["--config", "/app/config.yaml", "--detailed_debug"]
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    volumes:
+      - ./open-webui:/app/backend/data
+    ports:
+      - "3000:8080"
+    container_name: open-webui
+    restart: always
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: litellm
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
